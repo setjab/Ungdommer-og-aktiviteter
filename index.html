@@ -5,15 +5,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ungdom under 30 år Aktiviteter</title>
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    h1 {
+      text-align: center;
+      font-size: 2.5em;
+      margin-bottom: 20px;
+    }
+    label {
+      font-size: 1.2em;
+    }
+    select {
+      width: 60%;
+      padding: 10px;
+      font-size: 1em;
+    }
+    #total {
+      text-align: center;
+      font-size: 1.5em;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-  <h1 style="text-align: center;">Ungdom under 30 år Aktiviteter</h1>
+  <h1>Ungdom under 30 år Aktiviteter</h1>
   <div style="margin-bottom: 20px; text-align: center;">
     <label for="aktivitet-filter">Velg aktivitet:</label>
     <select id="aktivitet-filter" multiple>
       <!-- Alternativer vil bli lagt til dynamisk -->
     </select>
   </div>
+  <div id="total">Total: 0</div>
   <div id="graf" style="width: 100%; height: 600px;"></div>
 
   <script>
@@ -41,6 +66,13 @@
       { aktivitet: "Digitalt oppfølgingstiltak for arbeidsledige (jobbklubb)", tall: 17 },
     ];
 
+    // Farger for aktivitetene
+    const colors = [
+      "#FF5733", "#33FF57", "#3357FF", "#FF33A8", "#FF8C33", "#33FFF6", "#A833FF", 
+      "#FFC733", "#33D4FF", "#FF3380", "#8C33FF", "#33FF9C", "#D433FF", "#57FF33",
+      "#FF3333", "#3333FF", "#33FF33", "#FF5733", "#5733FF", "#33FFB6"
+    ];
+
     // Legg til alternativer i dropdown-menyen
     const select = document.getElementById("aktivitet-filter");
     data.forEach(item => {
@@ -54,25 +86,35 @@
     function drawGraph(filteredData) {
       const aktiviteter = filteredData.map(item => item.aktivitet);
       const tall = filteredData.map(item => item.tall);
+      const selectedColors = filteredData.map((_, index) => colors[index % colors.length]);
 
       const trace = {
         x: tall,
         y: aktiviteter,
         type: "bar",
         orientation: "h",
+        marker: { color: selectedColors },
       };
 
       const layout = {
         title: "Aktiviteter for ungdom under 30 år",
-        xaxis: { title: "Antall" },
-        yaxis: { title: "Aktiviteter", automargin: true },
+        titlefont: { size: 24 },
+        xaxis: { title: "Antall", titlefont: { size: 18 } },
+        yaxis: { title: "Aktiviteter", titlefont: { size: 18 }, automargin: true },
       };
 
       Plotly.newPlot("graf", [trace], layout);
     }
 
+    // Funksjon for å oppdatere totalen
+    function updateTotal(filteredData) {
+      const total = filteredData.reduce((sum, item) => sum + item.tall, 0);
+      document.getElementById("total").textContent = `Total: ${total}`;
+    }
+
     // Initial visning
     drawGraph(data);
+    updateTotal(data);
 
     // Oppdater grafen når filteret endres
     select.addEventListener("change", () => {
@@ -81,6 +123,7 @@
         ? data.filter(item => selectedOptions.includes(item.aktivitet))
         : data;
       drawGraph(filteredData);
+      updateTotal(filteredData);
     });
   </script>
 </body>
