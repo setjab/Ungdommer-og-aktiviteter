@@ -1,84 +1,87 @@
-import pandas as pd
-import plotly.express as px
-from dash import Dash, dcc, html, Input, Output
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ungdom under 30 år Aktiviteter</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+  <h1 style="text-align: center;">Ungdom under 30 år Aktiviteter</h1>
+  <div style="margin-bottom: 20px; text-align: center;">
+    <label for="aktivitet-filter">Velg aktivitet:</label>
+    <select id="aktivitet-filter" multiple>
+      <!-- Alternativer vil bli lagt til dynamisk -->
+    </select>
+  </div>
+  <div id="graf" style="width: 100%; height: 600px;"></div>
 
-# Data from the user's input
-data = {
-    "Aktivitet": [
-        "Enkeltplass AMO",
-        "Enkeltplass Fag- og yrkesopplæring VGS og høyere yrkesfaglig utdanning",
-        "Forsøk AMO enkeltplass",
-        "Forsøk fag- og yrkesopplæring enkeltplass",
-        "Gruppe AMO",
-        "Høyere utdanning",
-        "Individuell jobbstøtte (IPS)",
-        "Jobbklubb",
-        "Midlertidig lønnstilskudd",
-        "Oppfølging",
-        "Varig lønnstilskudd",
-        "Varig tilrettelagt arbeid i ordinær virksomhet",
-        "Varig tilrettelagt arbeid i skjermet virksomhet",
-        "Arbeid med støtte",
-        "Arbeidsforberedende trening (AFT)",
-        "Arbeidsmarkedskurs (AMO)",
-        "Arbeidsrettet rehabilitering (dag)",
-        "Arbeidstrening",
-        "Avklaring",
-        "Digitalt oppfølgingstiltak for arbeidsledige (jobbklubb)",
-    ],
-    "Tall": [
-        19, 21, 16, 16, 18, 21, 17, 16, 19, 20, 17, 4, 16, 19, 42, 16, 16, 21, 20, 17
-    ],
-}
+  <script>
+    // Data fra tabellen
+    const data = [
+      { aktivitet: "Enkeltplass AMO", tall: 19 },
+      { aktivitet: "Enkeltplass Fag- og yrkesopplæring VGS og høyere yrkesfaglig utdanning", tall: 21 },
+      { aktivitet: "Forsøk AMO enkeltplass", tall: 16 },
+      { aktivitet: "Forsøk fag- og yrkesopplæring enkeltplass", tall: 16 },
+      { aktivitet: "Gruppe AMO", tall: 18 },
+      { aktivitet: "Høyere utdanning", tall: 21 },
+      { aktivitet: "Individuell jobbstøtte (IPS)", tall: 17 },
+      { aktivitet: "Jobbklubb", tall: 16 },
+      { aktivitet: "Midlertidig lønnstilskudd", tall: 19 },
+      { aktivitet: "Oppfølging", tall: 20 },
+      { aktivitet: "Varig lønnstilskudd", tall: 17 },
+      { aktivitet: "Varig tilrettelagt arbeid i ordinær virksomhet", tall: 4 },
+      { aktivitet: "Varig tilrettelagt arbeid i skjermet virksomhet", tall: 16 },
+      { aktivitet: "Arbeid med støtte", tall: 19 },
+      { aktivitet: "Arbeidsforberedende trening (AFT)", tall: 42 },
+      { aktivitet: "Arbeidsmarkedskurs (AMO)", tall: 16 },
+      { aktivitet: "Arbeidsrettet rehabilitering (dag)", tall: 16 },
+      { aktivitet: "Arbeidstrening", tall: 21 },
+      { aktivitet: "Avklaring", tall: 20 },
+      { aktivitet: "Digitalt oppfølgingstiltak for arbeidsledige (jobbklubb)", tall: 17 },
+    ];
 
-# Create a DataFrame
-df = pd.DataFrame(data)
+    // Legg til alternativer i dropdown-menyen
+    const select = document.getElementById("aktivitet-filter");
+    data.forEach(item => {
+      const option = document.createElement("option");
+      option.value = item.aktivitet;
+      option.textContent = item.aktivitet;
+      select.appendChild(option);
+    });
 
-# Initialize the Dash app
-app = Dash(__name__)
+    // Funksjon for å tegne grafen
+    function drawGraph(filteredData) {
+      const aktiviteter = filteredData.map(item => item.aktivitet);
+      const tall = filteredData.map(item => item.tall);
 
-# Layout of the dashboard
-app.layout = html.Div([
-    html.H1("Ungdom under 30 år Aktiviteter", style={"textAlign": "center"}),
-    
-    # Dropdown for filtering activities
-    html.Div([
-        html.Label("Velg aktivitet:"),
-        dcc.Dropdown(
-            id="aktivitet-filter",
-            options=[{"label": aktivitet, "value": aktivitet} for aktivitet in df["Aktivitet"].unique()],
-            value=None,
-            multi=True,
-            placeholder="Velg en eller flere aktiviteter",
-        ),
-    ], style={"marginBottom": 20}),
+      const trace = {
+        x: tall,
+        y: aktiviteter,
+        type: "bar",
+        orientation: "h",
+      };
 
-    # Graph container
-    dcc.Graph(id="aktivitet-graf"),
-])
+      const layout = {
+        title: "Aktiviteter for ungdom under 30 år",
+        xaxis: { title: "Antall" },
+        yaxis: { title: "Aktiviteter", automargin: true },
+      };
 
-# Callback to update the graph
-@app.callback(
-    Output("aktivitet-graf", "figure"),
-    [Input("aktivitet-filter", "value")]
-)
-def update_graph(selected_activities):
-    filtered_df = df
-    if selected_activities:
-        filtered_df = df[df["Aktivitet"].isin(selected_activities)]
-    
-    # Create a bar chart
-    fig = px.bar(
-        filtered_df,
-        x="Tall",
-        y="Aktivitet",
-        orientation="h",
-        title="Aktiviteter for ungdom under 30 år",
-        labels={"Tall": "Antall", "Aktivitet": "Aktiviteter"},
-    )
-    fig.update_layout(yaxis=dict(categoryorder="total ascending"))
-    return fig
+      Plotly.newPlot("graf", [trace], layout);
+    }
 
-# Run the app
-if __name__ == "__main__":
-    app.run_server(debug=False)
+    // Initial visning
+    drawGraph(data);
+
+    // Oppdater grafen når filteret endres
+    select.addEventListener("change", () => {
+      const selectedOptions = Array.from(select.selectedOptions).map(option => option.value);
+      const filteredData = selectedOptions.length
+        ? data.filter(item => selectedOptions.includes(item.aktivitet))
+        : data;
+      drawGraph(filteredData);
+    });
+  </script>
+</body>
+</html>
