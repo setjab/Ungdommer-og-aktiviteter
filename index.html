@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ungdom under 30 år Aktiviteter</title>
+  <title>Ungdom under 30 år Tiltak</title>
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   <style>
     body {
@@ -31,10 +31,10 @@
   </style>
 </head>
 <body>
-  <h1>Ungdom under 30 år Aktiviteter</h1>
+  <h1>Ungdom under 30 år Tiltak</h1>
   <div style="margin-bottom: 20px; text-align: center;">
-    <label for="aktivitet-filter">Velg aktivitet:</label>
-    <select id="aktivitet-filter" multiple>
+    <label for="tiltak-filter">Velg tiltak:</label>
+    <select id="tiltak-filter" multiple>
       <!-- Alternativer vil bli lagt til dynamisk -->
     </select>
   </div>
@@ -44,29 +44,29 @@
   <script>
     // Data fra tabellen
     const data = [
-      { aktivitet: "Enkeltplass AMO", tall: 19 },
-      { aktivitet: "Enkeltplass Fag- og yrkesopplæring VGS og høyere yrkesfaglig utdanning", tall: 21 },
-      { aktivitet: "Forsøk AMO enkeltplass", tall: 16 },
-      { aktivitet: "Forsøk fag- og yrkesopplæring enkeltplass", tall: 16 },
-      { aktivitet: "Gruppe AMO", tall: 18 },
-      { aktivitet: "Høyere utdanning", tall: 21 },
-      { aktivitet: "Individuell jobbstøtte (IPS)", tall: 17 },
-      { aktivitet: "Jobbklubb", tall: 16 },
-      { aktivitet: "Midlertidig lønnstilskudd", tall: 19 },
-      { aktivitet: "Oppfølging", tall: 20 },
-      { aktivitet: "Varig lønnstilskudd", tall: 17 },
-      { aktivitet: "Varig tilrettelagt arbeid i ordinær virksomhet", tall: 4 },
-      { aktivitet: "Varig tilrettelagt arbeid i skjermet virksomhet", tall: 16 },
-      { aktivitet: "Arbeid med støtte", tall: 19 },
-      { aktivitet: "Arbeidsforberedende trening (AFT)", tall: 42 },
-      { aktivitet: "Arbeidsmarkedskurs (AMO)", tall: 16 },
-      { aktivitet: "Arbeidsrettet rehabilitering (dag)", tall: 16 },
-      { aktivitet: "Arbeidstrening", tall: 21 },
-      { aktivitet: "Avklaring", tall: 20 },
-      { aktivitet: "Digitalt oppfølgingstiltak for arbeidsledige (jobbklubb)", tall: 17 },
+      { tiltak: "Enkeltplass AMO", tall: 3 },
+      { tiltak: "Enkeltplass Fag- og yrkesopplæring VGS og høyere yrkesfaglig utdanning", tall: 5 },
+      { tiltak: "Forsøk AMO enkeltplass", tall: 0 },
+      { tiltak: "Forsøk fag- og yrkesopplæring enkeltplass", tall: 0 },
+      { tiltak: "Gruppe AMO", tall: 2 },
+      { tiltak: "Høyere utdanning", tall: 4 },
+      { tiltak: "Individuell jobbstøtte (IPS)", tall: 1 },
+      { tiltak: "Jobbklubb", tall: 0 },
+      { tiltak: "Midlertidig lønnstilskudd", tall: 2 },
+      { tiltak: "Oppfølging", tall: 1 },
+      { tiltak: "Varig lønnstilskudd", tall: 1 },
+      { tiltak: "Varig tilrettelagt arbeid i ordinær virksomhet", tall: 0 },
+      { tiltak: "Varig tilrettelagt arbeid i skjermet virksomhet", tall: 1 },
+      { tiltak: "Arbeid med støtte", tall: 1 },
+      { tiltak: "Arbeidsforberedende trening (AFT)", tall: 6 },
+      { tiltak: "Arbeidsmarkedskurs (AMO)", tall: 1 },
+      { tiltak: "Arbeidsrettet rehabilitering (dag)", tall: 0 },
+      { tiltak: "Arbeidstrening", tall: 4 },
+      { tiltak: "Avklaring", tall: 3 },
+      { tiltak: "Digitalt oppfølgingstiltak for arbeidsledige (jobbklubb)", tall: 2 },
     ];
 
-    // Farger for aktivitetene
+    // Farger for tiltakene
     const colors = [
       "#FF5733", "#33FF57", "#3357FF", "#FF33A8", "#FF8C33", "#33FFF6", "#A833FF", 
       "#FFC733", "#33D4FF", "#FF3380", "#8C33FF", "#33FF9C", "#D433FF", "#57FF33",
@@ -74,33 +74,33 @@
     ];
 
     // Legg til alternativer i dropdown-menyen
-    const select = document.getElementById("aktivitet-filter");
+    const select = document.getElementById("tiltak-filter");
     data.forEach(item => {
       const option = document.createElement("option");
-      option.value = item.aktivitet;
-      option.textContent = item.aktivitet;
+      option.value = item.tiltak;
+      option.textContent = item.tiltak;
       select.appendChild(option);
     });
 
     // Funksjon for å tegne grafen
     function drawGraph(filteredData) {
-      const aktiviteter = filteredData.map(item => item.aktivitet);
+      const tiltak = filteredData.map(item => item.tiltak);
       const tall = filteredData.map(item => item.tall);
       const selectedColors = filteredData.map((_, index) => colors[index % colors.length]);
 
       const trace = {
         x: tall,
-        y: aktiviteter,
+        y: tiltak,
         type: "bar",
         orientation: "h",
         marker: { color: selectedColors },
       };
 
       const layout = {
-        title: "Aktiviteter for ungdom under 30 år",
+        title: "Tiltak for ungdom under 30 år",
         titlefont: { size: 24 },
         xaxis: { title: "Antall", titlefont: { size: 18 } },
-        yaxis: { title: "Aktiviteter", titlefont: { size: 18 }, automargin: true },
+        yaxis: { title: "Tiltak", titlefont: { size: 18 }, automargin: true },
       };
 
       Plotly.newPlot("graf", [trace], layout);
@@ -120,7 +120,7 @@
     select.addEventListener("change", () => {
       const selectedOptions = Array.from(select.selectedOptions).map(option => option.value);
       const filteredData = selectedOptions.length
-        ? data.filter(item => selectedOptions.includes(item.aktivitet))
+        ? data.filter(item => selectedOptions.includes(item.tiltak))
         : data;
       drawGraph(filteredData);
       updateTotal(filteredData);
