@@ -1,0 +1,84 @@
+import pandas as pd
+import plotly.express as px
+from dash import Dash, dcc, html, Input, Output
+
+# Data from the user's input
+data = {
+    "Aktivitet": [
+        "Enkeltplass AMO",
+        "Enkeltplass Fag- og yrkesopplæring VGS og høyere yrkesfaglig utdanning",
+        "Forsøk AMO enkeltplass",
+        "Forsøk fag- og yrkesopplæring enkeltplass",
+        "Gruppe AMO",
+        "Høyere utdanning",
+        "Individuell jobbstøtte (IPS)",
+        "Jobbklubb",
+        "Midlertidig lønnstilskudd",
+        "Oppfølging",
+        "Varig lønnstilskudd",
+        "Varig tilrettelagt arbeid i ordinær virksomhet",
+        "Varig tilrettelagt arbeid i skjermet virksomhet",
+        "Arbeid med støtte",
+        "Arbeidsforberedende trening (AFT)",
+        "Arbeidsmarkedskurs (AMO)",
+        "Arbeidsrettet rehabilitering (dag)",
+        "Arbeidstrening",
+        "Avklaring",
+        "Digitalt oppfølgingstiltak for arbeidsledige (jobbklubb)",
+    ],
+    "Tall": [
+        19, 21, 16, 16, 18, 21, 17, 16, 19, 20, 17, 4, 16, 19, 42, 16, 16, 21, 20, 17
+    ],
+}
+
+# Create a DataFrame
+df = pd.DataFrame(data)
+
+# Initialize the Dash app
+app = Dash(__name__)
+
+# Layout of the dashboard
+app.layout = html.Div([
+    html.H1("Ungdom under 30 år Aktiviteter", style={"textAlign": "center"}),
+    
+    # Dropdown for filtering activities
+    html.Div([
+        html.Label("Velg aktivitet:"),
+        dcc.Dropdown(
+            id="aktivitet-filter",
+            options=[{"label": aktivitet, "value": aktivitet} for aktivitet in df["Aktivitet"].unique()],
+            value=None,
+            multi=True,
+            placeholder="Velg en eller flere aktiviteter",
+        ),
+    ], style={"marginBottom": 20}),
+
+    # Graph container
+    dcc.Graph(id="aktivitet-graf"),
+])
+
+# Callback to update the graph
+@app.callback(
+    Output("aktivitet-graf", "figure"),
+    [Input("aktivitet-filter", "value")]
+)
+def update_graph(selected_activities):
+    filtered_df = df
+    if selected_activities:
+        filtered_df = df[df["Aktivitet"].isin(selected_activities)]
+    
+    # Create a bar chart
+    fig = px.bar(
+        filtered_df,
+        x="Tall",
+        y="Aktivitet",
+        orientation="h",
+        title="Aktiviteter for ungdom under 30 år",
+        labels={"Tall": "Antall", "Aktivitet": "Aktiviteter"},
+    )
+    fig.update_layout(yaxis=dict(categoryorder="total ascending"))
+    return fig
+
+# Run the app
+if __name__ == "__main__":
+    app.run_server(debug=True)
